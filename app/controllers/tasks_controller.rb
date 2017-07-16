@@ -1,51 +1,34 @@
 class TasksController < ApplicationController
-  def index()
+  include Api
+
+  before_action :find_record, only: [:show, :update, :destroy, :complete]
+
+  def index_scope
     @collection = Task.where(board_id: params[:board_id])
 
-    if(params["type"] != nil)
-      case params['type'].to_sym
-      when :completed
-        @collection = @collection.where("completed_at is not null")
-      when :incompleted
-        @collection = @collection.where(completed_at: nil)
-      end
+    extra_scope = params['type'] && params['type'].to_sym
+    if extra_scope && accessible_scopes.include?(extra_scope)
+      @collection = @collection.send(extra_scope)
     end
-   
-    render json: @collection
 
+    @collection
   end
 
-    def show()
-      @resource = Task.find(params[:id])
-      render json: @resource
-    end
-
-    def create()
-      @resource = Task.create(resource_params.merge(board_id: params[:board_id]))
-      render json: @resource
-    end
-
-    def complete
-      @resource = Task.find(params[:id])
-      @resource.update(completed_at: Time.now)
-      render json: @resource
-    end
-
-    def update()
-      @resource = Task.find(params[:id])
-      @resource.update(resource_params)
-      render json: @resource
-    end
-
-    def destroy()
-      @resource = Task.find(params[:id])
-      @resource.destroy
-      render json: @resource
-    end
+  def complete
+    @resource.update(completed_at: Time.zone.now)
+    render json: @resource
+  end
 
   private
+    def accessible_scopes
+      [:completed, :incompleted]
+    end
 
-  def resource_params
-    params.require(:task).permit(:title, :description)
-  end
+    def params_for_create
+      resource_params.merge(board_id: params[:board_id])
+    end
+
+    def resource_params
+      params.require(:task).permit(:title, :description)
+    end
 end

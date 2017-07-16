@@ -1,0 +1,15 @@
+<% 10.times do |i| %>
+  <% 5.times do |j| %>
+    uncompleted_task_<%= i %>_<%= j %>:
+      title: <%= "Incompleted Task #{j} Title" %>
+      description: <%= "Incompleted Task #{j} for board #{i}." %>
+      board: <%= "board_#{i}" %>
+  <% end %>
+  <% 2.times do |j| %>
+    completed_task_<%= i %>_<%= j %>:
+      title: <%= "Completed Task #{j} Title" %>
+      description: <%= "Task #{j} for board #{i}." %>
+      board: <%= "board_#{i}" %>
+      completed_at: <%= Time.zone.now %>
+  <% end %>
+<% end %>

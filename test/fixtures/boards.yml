@@ -1,0 +1,5 @@
+<% 11.times do |i| %>
+  board_<%= i %>:
+    title: <%= "Board #{i} Title" %>
+    description: <%= "Board #{i} description." %>
+<% end %>
